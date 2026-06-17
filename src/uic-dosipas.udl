@@ -1,0 +1,101 @@
+namespace uic_dosipas {};
+
+[Error]
+interface BarcodeError {
+  UnknownBarcodeType();
+  InvalidFormat(string msg);
+  CryptographyError(string msg);
+  UnsupportedData(string msg);
+};
+
+interface Dosipas {
+  [Name=new_from_bytes,Throws=BarcodeError]
+  constructor([ByRef] bytes data);
+  string security_provider();
+  u32 key_id();
+  timestamp? end_of_validity();
+  duration? validity_duration();
+  sequence<Record> records();
+  Record? level_2_data();
+  [Throws=BarcodeError]
+  void set_dynamic_content([ByRef] DynamicContentData data);
+  boolean is_matching_public_key([ByRef] PublicKey key);
+  [Throws=BarcodeError]
+  bytes sign([ByRef] PrivateKey key);
+};
+
+interface DynamicContentData {
+  constructor();
+  [Throws=BarcodeError]
+  void set_mobile_app_id([ByRef] string app_id);
+  void set_timestamp(timestamp time);
+  void set_coordinate(GeoCoordinate coordinate);
+  void add_response_to_challenge(Record response);
+  void set_extension(Record response);
+};
+
+interface GeoCoordinate {
+  constructor(LatLong position);
+  void set_coordinate_system(GeoCoordinateSystem system);
+  void set_accuracy_from_meters(LatLong position, f64 accuracy);
+  void set_accuracy_raw(GeoUnit accuracy);
+};
+
+dictionary LatLong {
+  f64 latitude;
+  f64 longitude;
+};
+
+enum GeoCoordinateSystem {
+  "WGS84",
+  "GRS80"
+};
+
+enum GeoUnit {
+  "MicroDegree",
+  "TenthMilliDegree",
+  "MilliDegree",
+  "CentiDegree",
+  "DeciDegree",
+};
+
+dictionary Record {
+  string record_id;
+  bytes data;
+};
+
+[Trait, WithForeign]
+interface Keychain {
+  KeychainKey gen_p256_key();
+  KeychainKey? get_by_key_id(string key_id);
+};
+
+enum KeyVariant {
+  "P256",
+};
+
+[Trait, WithForeign]
+interface KeychainKey {
+  string key_id();
+  KeyVariant variant();
+  bytes public_key();
+  bytes sign(bytes message);
+};
+
+interface PublicKey {
+  bytes public_bytes();
+  boolean eq_private_key([ByRef] PrivateKey priv);
+  string key_alg_str();
+  sequence<u32> key_alg_list();
+  string signing_alg_str();
+  sequence<u32> signing_alg_list();
+};
+
+interface PrivateKey {
+  [Name=gen_p256]
+  constructor(Keychain keychain);
+  [Name=from_keychain,Throws=BarcodeError]
+  constructor(Keychain keychain, [ByRef] string key_id);
+  string key_id();
+  PublicKey public_key();
+};

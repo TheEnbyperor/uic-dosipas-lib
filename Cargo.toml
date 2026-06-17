@@ -1,0 +1,29 @@
+[package]
+name = "uic-dosipas-lib"
+version = "0.0.1"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+name = "uic_dosipas"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "util/uniffi-bindgen.rs"
+
+[dependencies]
+rasn = "0.28.13"
+uniffi = { version = "0.31", features = [ "cli" ] }
+thiserror = "2.0.18"
+chrono = "0.4.45"
+p256 = "0.14.0-rc.12"
+
+[build-dependencies]
+uniffi = { version = "0.31", features = [ "build" ] }
+rasn-compiler = { version = "0.16.0", git = "https://github.com/TheEnbyperor/compiler.git" }
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1

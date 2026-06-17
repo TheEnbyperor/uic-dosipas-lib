@@ -1,0 +1,40 @@
+name: iOS Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  ios-release:
+    runs-on: macos-15
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: root
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'
+
+      - name: Build iOS XCFramework
+        run: ./build-ios.sh
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+
+      - name: Move Tag
+        run: |
+          git tag -fa ${{ github.event.release.tag_name }} -m "Swift Package checksum for Release ${{ github.event.release.tag_name }}"
+          git push origin ${{ github.event.release.tag_name }} --force
+
+      - name: Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          files: target/ios/libuic_dosipas-rs.xcframework.zip
+          draft: false
+          tag_name: ${{ github.event.release.tag_name }}
