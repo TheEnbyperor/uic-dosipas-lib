@@ -24,7 +24,7 @@ impl PublicKey {
 
     pub fn public_bytes(&self) -> Vec<u8> {
         match self {
-            Self::P256(key) => key.to_sec1_bytes().to_vec(),
+            Self::P256(key) => key.to_sec1_point(true).as_bytes().to_vec(),
         }
     }
 
