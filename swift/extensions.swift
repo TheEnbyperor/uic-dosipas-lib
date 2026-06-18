@@ -1,5 +1,6 @@
 import Foundation
 import Security
+import CoreLocation
 
 func randomString(length: Int) -> String {
   let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -83,5 +84,30 @@ public final class AppleKeychain: Keychain {
         guard status == errSecSuccess else { return nil }
         let privateKey = item as! SecKey
         return AppleKeychainKey(privateKey: privateKey, keyId: keyId)
+    }
+}
+
+extension LatLong {
+    public init(_ loc: CLLocationCoordinate2D) {
+        latitude = loc.latitude
+        longitude = loc.longitude
+    }
+}
+
+extension GeoCoordinate {
+    public convenience init(_ loc: CLLocation) {
+        self.init(position: LatLong(loc.coordinate))
+        self.setAccuracyFromMeters(accuracy: loc.horizontalAccuracy)
+        self.setCoordinateSystem(system: .wgs84)
+    }
+    
+    public convenience init(_ loc: CLLocationCoordinate2D) {
+        self.init(position: LatLong(loc))
+    }
+}
+
+extension DynamicContentData {
+    public func setCoordinate(_ loc: CLLocation) {
+        self.setCoordinate(coordinate: GeoCoordinate(loc))
     }
 }

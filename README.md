@@ -38,14 +38,18 @@ let dcd = UicDosipas.DynamicContentData()
 try! dcd.setMobileAppId(appId: "ExampleApp")
 // Set the generation time
 dcd.setTimestamp(time: Date.now)
-// Set the generation coordinate
-let position = UicDosipas.GeoCoordinate(position: UicDosipas.LatLong(
-    latitude: 49.23,
-    longitude: 6.99
+// Set the generation coordinate, usually the CLLocation would be returned by CoreLocation services.
+dcd.setCoordinate(CLLocation(
+    coordinate: CLLocationCoordinate2D(latitude: 49.33, longitude: 6.99),
+    altitude: 0,
+    horizontalAccuracy: 10_000.0,
+    verticalAccuracy: 0,
+    timestamp: Date.now
 ))
+// A coordinate can also be constructed from just a 2D coordinate.
+let position = UicDosipas.GeoCoordinate(CLLocationCoordinate2D(latitude: 49.33, longitude: 6.99))
 position.setAccuracyFromMeters(accuracy: 10_000.0)
 position.setCoordinateSystem(system: .wgs84)
-dcd.setCoordinate(coordinate: position)
 // Put the DCD record in the Level 2 data of the barcode
 try! barcode.setDynamicContent(data: dcd)
 
