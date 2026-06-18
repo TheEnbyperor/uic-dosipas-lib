@@ -37,7 +37,7 @@ interface DynamicContentData {
 interface GeoCoordinate {
   constructor(LatLong position);
   void set_coordinate_system(GeoCoordinateSystem system);
-  void set_accuracy_from_meters(LatLong position, f64 accuracy);
+  void set_accuracy_from_meters(f64 accuracy);
   void set_accuracy_raw(GeoUnit accuracy);
 };
 

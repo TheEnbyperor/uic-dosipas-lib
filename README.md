@@ -39,12 +39,11 @@ try! dcd.setMobileAppId(appId: "ExampleApp")
 // Set the generation time
 dcd.setTimestamp(time: Date.now)
 // Set the generation coordinate
-let latLng = UicDosipas.LatLong(
+let position = UicDosipas.GeoCoordinate(position: UicDosipas.LatLong(
     latitude: 49.23,
     longitude: 6.99
-)
-let position = UicDosipas.GeoCoordinate(position: latLng)
-position.setAccuracyFromMeters(position: latLng, accuracy: 10_000.0)
+))
+position.setAccuracyFromMeters(accuracy: 10_000.0)
 position.setCoordinateSystem(system: .wgs84)
 dcd.setCoordinate(coordinate: position)
 // Put the DCD record in the Level 2 data of the barcode

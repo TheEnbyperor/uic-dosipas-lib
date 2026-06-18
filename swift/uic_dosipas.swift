@@ -982,7 +982,7 @@ public func FfiConverterTypeDynamicContentData_lower(_ value: DynamicContentData
 
 public protocol GeoCoordinateProtocol: AnyObject, Sendable {
     
-    func setAccuracyFromMeters(position: LatLong, accuracy: Double) 
+    func setAccuracyFromMeters(accuracy: Double) 
     
     func setAccuracyRaw(accuracy: GeoUnit) 
     
@@ -1050,10 +1050,9 @@ public convenience init(position: LatLong) {
     
 
     
-open func setAccuracyFromMeters(position: LatLong, accuracy: Double)  {try! rustCall() {
+open func setAccuracyFromMeters(accuracy: Double)  {try! rustCall() {
     uniffi_uic_dosipas_fn_method_geocoordinate_set_accuracy_from_meters(
             self.uniffiCloneHandle(),
-        FfiConverterTypeLatLong_lower(position),
         FfiConverterDouble.lower(accuracy),$0
     )
 }
@@ -2582,7 +2581,7 @@ private let initializationResult: InitializationResult = {
     if (uniffi_uic_dosipas_checksum_method_dynamiccontentdata_set_timestamp() != 46174) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_uic_dosipas_checksum_method_geocoordinate_set_accuracy_from_meters() != 27024) {
+    if (uniffi_uic_dosipas_checksum_method_geocoordinate_set_accuracy_from_meters() != 27039) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_uic_dosipas_checksum_method_geocoordinate_set_accuracy_raw() != 13471) {

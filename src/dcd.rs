@@ -128,8 +128,9 @@ impl GeoCoordinate {
         self.inner.write().unwrap().coordinate_system = system;
     }
 
-    pub fn set_accuracy_from_meters(&self, position: LatLong, accuracy_meters: f64) {
-        self.inner.write().unwrap().accuracy = Some(GeoUnit::from_accuracy_meters(position, accuracy_meters));
+    pub fn set_accuracy_from_meters(&self, accuracy_meters: f64) {
+        let mut inner = self.inner.write().unwrap();
+        inner.accuracy = Some(GeoUnit::from_accuracy_meters(&inner.position, accuracy_meters));
     }
 
     pub fn set_accuracy_raw(&self, accuracy: GeoUnit) {
@@ -191,7 +192,7 @@ impl GeoCoordinate {
 }
 
 impl GeoUnit {
-    pub fn from_accuracy_meters(position: LatLong, accuracy_meters: f64) -> GeoUnit {
+    pub fn from_accuracy_meters(position: &LatLong, accuracy_meters: f64) -> GeoUnit {
         let meters_per_degree_at_latitude = position.latitude.to_radians().cos() * METERS_PER_DEGREE_AT_EQUATOR;
         let degrees_accuracy = accuracy_meters / meters_per_degree_at_latitude;
         let micro_degrees_accuracy = (degrees_accuracy * 100_000.0).round() as u64;
