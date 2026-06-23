@@ -2,3 +2,7 @@
 /.swiftpm
 /.build
 /asn1_gen/*.rs
+/.idea
+/build
+/.gradle
+local.properties

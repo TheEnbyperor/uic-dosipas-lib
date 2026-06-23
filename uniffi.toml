@@ -1,2 +1,7 @@
 [bindings.swift]
 generate_codable_conformance = true
+
+[bindings.kotlin]
+package_name = "org.uic.dosipas"
+android = true
+cdylib_name = "uic_dosipas"
