@@ -3,7 +3,7 @@
 import PackageDescription
 
 let releaseTag = "0.0.5"
-let releaseChecksum = "7be1eb490fb6deb6e04e461f163c7f02d0e9275a683d7e6f4ae97f788636093f"
+let releaseChecksum = "9d0dd4e61f961ad9c901ec64885e97622f6a89dc9ce236b4308540fd5ee24c74"
 let binaryTarget: Target = .binaryTarget(
     name: "UicDosipasRS",
     url: "https://github.com/TheEnbyperor/uic-dosipas-lib/releases/download/\(releaseTag)/libuic_dosipas-rs.xcframework.zip",
