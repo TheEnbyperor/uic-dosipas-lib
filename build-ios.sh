@@ -24,5 +24,4 @@ xcodebuild -create-xcframework \
 ditto -c -k --sequesterRsrc --keepParent target/ios/libuic_dosipas-rs.xcframework target/ios/libuic_dosipas-rs.xcframework.zip
 checksum=$(swift package compute-checksum target/ios/libuic_dosipas-rs.xcframework.zip)
 version=$(cargo metadata --format-version 1 | jq -r --arg pkg_name "uic-dosipas-lib" '.packages[] | select(.name==$pkg_name) .version')
-sed -i "" -E "s/(let releaseTag = \")[^\"]+(\")/\1$version\2/g" Package.swift
 sed -i "" -E "s/(let releaseChecksum = \")[^\"]+(\")/\1$checksum\2/g" Package.swift
