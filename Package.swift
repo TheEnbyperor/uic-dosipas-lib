@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let releaseTag = "0.0.4"
+let releaseTag = "0.0.5"
 let releaseChecksum = "dec50df8301d49f1d3c645a51ba0a61c5ea0b64e0c8f62e7683a09df2e2e652d"
 let binaryTarget: Target = .binaryTarget(
     name: "UicDosipasRS",

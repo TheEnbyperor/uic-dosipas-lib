@@ -149,7 +149,7 @@ publishing {
 
             groupId = "org.uic"
             artifactId = "dosipas"
-            version = "4.6.0"
+            version = "0.0.5"
         }
     }
     repositories {
