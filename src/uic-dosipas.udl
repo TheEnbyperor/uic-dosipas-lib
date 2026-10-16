@@ -96,6 +96,8 @@ interface PrivateKey {
   constructor(Keychain keychain);
   [Name=from_keychain,Throws=BarcodeError]
   constructor(Keychain keychain, [ByRef] string key_id);
+  [Name=from_keychain_key]
+  constructor(KeychainKey key);
   string key_id();
   PublicKey public_key();
 };

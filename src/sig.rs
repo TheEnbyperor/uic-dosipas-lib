@@ -96,6 +96,15 @@ impl PrivateKey {
         })
     }
 
+    pub(crate) fn from_keychain_key(keychain_key: std::sync::Arc<dyn crate::KeychainKey>) -> Self {
+        Self {
+            variant: match keychain_key.variant() {
+                crate::KeyVariant::P256 => PrivateKeyVariant::P256,
+            },
+            key: keychain_key
+        }
+    }
+
     pub fn key_id(&self) -> String {
         self.key.key_id()
     }

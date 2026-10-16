@@ -69,6 +69,11 @@ pub struct Record {
     pub data: Vec<u8>,
 }
 
+enum Level2Data {
+    V1(asn1::asn_module_header_v1::Level2DataType),
+    V2(asn1::asn_module_header_v2::Level2DataType),
+}
+
 impl Dosipas {
     fn new_from_bytes(data: &[u8]) -> Result<Dosipas, BarcodeError> {
         if let Ok(data) =
@@ -126,10 +131,10 @@ impl Dosipas {
         *defined_public_key == *public_key && *defined_signing_alg == public_key.signing_alg()
     }
 
-    pub fn sign(&self, private_key: &PrivateKey) -> Result<Vec<u8>, BarcodeError> {
+    fn _tbs(&self) -> Result<(Vec<u8>, Level2Data), BarcodeError> {
         match self.version {
             DosipasVersion::V1 => {
-                let level_1_data = asn1::asn_module_header_v1::Level2DataType {
+                let level_2_data = asn1::asn_module_header_v1::Level2DataType {
                     level1_data: rasn::uper::decode(&self.level_1_data).unwrap(),
                     level1_signature: Some(self.level_1_signature.clone().into()),
                     level2_data: match self.level_2_data.read().unwrap().as_ref() {
@@ -141,17 +146,10 @@ impl Dosipas {
                         None => None,
                     }
                 };
-                let tbs_data = rasn::uper::encode(&level_1_data).unwrap();
-                let sig = private_key.sign(&tbs_data);
-                let level_2_data = asn1::asn_module_header_v1::UicBarcodeHeader {
-                    format: rasn::types::Ia5String::from_iso646_bytes(b"U1").unwrap(),
-                    level2_signed_data: level_1_data,
-                    level2_signature: Some(sig.into()),
-                };
-                Ok(rasn::uper::encode(&level_2_data).unwrap())
+                Ok((rasn::uper::encode(&level_2_data).unwrap(), Level2Data::V1(level_2_data)))
             },
             DosipasVersion::V2 => {
-                let level_1_data = asn1::asn_module_header_v2::Level2DataType {
+                let level_2_data = asn1::asn_module_header_v2::Level2DataType {
                     level1_data: rasn::uper::decode(&self.level_1_data).unwrap(),
                     level1_signature: Some(self.level_1_signature.clone().into()),
                     level2_data: match self.level_2_data.read().unwrap().as_ref() {
@@ -163,16 +161,36 @@ impl Dosipas {
                         None => None,
                     }
                 };
-                let tbs_data = rasn::uper::encode(&level_1_data).unwrap();
-                let sig = private_key.sign(&tbs_data);
-                let level_2_data = asn1::asn_module_header_v2::UicBarcodeHeader {
-                    format: rasn::types::Ia5String::from_iso646_bytes(b"U2").unwrap(),
-                    level2_signed_data: level_1_data,
-                    level2_signature: Some(sig.into()),
-                };
-                Ok(rasn::uper::encode(&level_2_data).unwrap())
+                Ok((rasn::uper::encode(&level_2_data).unwrap(), Level2Data::V2(level_2_data)))
             }
         }
+    }
+
+    fn _encode_signed(sig: Vec<u8>, level_2_data: Level2Data) -> Vec<u8> {
+        match level_2_data {
+            Level2Data::V1(level_2_data) => {
+                let level_2_data = asn1::asn_module_header_v1::UicBarcodeHeader {
+                    format: rasn::types::Ia5String::from_iso646_bytes(b"U1").unwrap(),
+                    level2_signed_data: level_2_data,
+                    level2_signature: Some(sig.into()),
+                };
+                rasn::uper::encode(&level_2_data).unwrap()
+            },
+            Level2Data::V2(level_2_data) => {
+                let level_2_data = asn1::asn_module_header_v2::UicBarcodeHeader {
+                    format: rasn::types::Ia5String::from_iso646_bytes(b"U2").unwrap(),
+                    level2_signed_data: level_2_data,
+                    level2_signature: Some(sig.into()),
+                };
+                rasn::uper::encode(&level_2_data).unwrap()
+            }
+        }
+    }
+
+    pub fn sign(&self, private_key: &PrivateKey) -> Result<Vec<u8>, BarcodeError> {
+        let (tbs, level_2_data) = self._tbs()?;
+        let sig = private_key.sign(&tbs);
+        Ok(Self::_encode_signed(sig, level_2_data))
     }
 }
 
