@@ -1715,6 +1715,14 @@ public static func fromKeychain(keychain: Keychain, keyId: String)throws  -> Pri
 })
 }
     
+public static func fromKeychainKey(key: KeychainKey) -> PrivateKey  {
+    return try!  FfiConverterTypePrivateKey_lift(try! rustCall() {
+    uniffi_uic_dosipas_fn_constructor_privatekey_from_keychain_key(
+        FfiConverterTypeKeychainKey_lower(key),$0
+    )
+})
+}
+    
 public static func genP256(keychain: Keychain) -> PrivateKey  {
     return try!  FfiConverterTypePrivateKey_lift(try! rustCall() {
     uniffi_uic_dosipas_fn_constructor_privatekey_gen_p256(
@@ -2642,6 +2650,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_uic_dosipas_checksum_constructor_privatekey_from_keychain() != 42027) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_uic_dosipas_checksum_constructor_privatekey_from_keychain_key() != 37268) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_uic_dosipas_checksum_constructor_privatekey_gen_p256() != 13840) {
